@@ -2,8 +2,18 @@
 
 declare(strict_types=1);
 
-return [
-    'dsn' => getenv('DB_DSN') ?: 'sqlite:' . dirname(__DIR__) . '/storage/database.sqlite',
-    'username' => getenv('DB_USERNAME') ?: null,
-    'password' => getenv('DB_PASSWORD') ?: null,
-];
+$dsn = getenv('DB_DSN');
+$username = getenv('DB_USERNAME');
+$password = getenv('DB_PASSWORD');
+
+if (!is_string($dsn) || !str_starts_with($dsn, 'mysql:')) {
+    throw new RuntimeException('DB_DSN must contain a valid MySQL PDO DSN.');
+}
+if (!is_string($username) || $username === '') {
+    throw new RuntimeException('DB_USERNAME is required.');
+}
+if (!is_string($password) || $password === '') {
+    throw new RuntimeException('DB_PASSWORD is required.');
+}
+
+return ['dsn' => $dsn, 'username' => $username, 'password' => $password];

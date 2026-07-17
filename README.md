@@ -1,51 +1,14 @@
 # Atrium Ledger
 
-A production-minded, framework-free transaction processing application for PHP 8.1+. It streams CSV data into a normalized SQLite ledger, records independent validation failures, and provides an operational dashboard with search, filters, sorting, pagination, and transaction inspection.
+A production-minded, framework-free transaction processing application for PHP 8.1+ and MySQL 8. It streams CSV data into a normalized ledger, records independent validation failures, and provides an operational dashboard with search, filters, sorting, pagination, reporting, and a JSON API.
 
 ## Quick start
 
-Requirements: PHP 8.1+ with PDO SQLite.
+Requirements:
 
-```bash
-cd web
-php -d upload_max_filesize=50M -d post_max_size=52M -d max_execution_time=300 \
-    -S 127.0.0.1:8080 -t public
-```
-
-Open `http://127.0.0.1:8080`, select **Import CSV**, and upload `../transactions_dirty.csv`.
-
-For reproducible or large imports, use the CLI:
-
-```bash
-php bin/import.php ../transactions_dirty.csv
-```
-
-No dependency installation or database setup is required. On first request, the application creates `storage/database.sqlite`, applies the idempotent schema, and initializes structured JSON logs in `storage/logs/application.log`.
-
-The explicit PHP options are important when using PHP's built-in CLI server: its default
-upload limit is commonly 2 MB, while the supplied CSV is approximately 2.5 MB. For
-Apache/FPM deployments, `public/.user.ini` supplies the same limits when user INI files
-are enabled.
-
-### Fixed web-root hosting
-
-If the hosting provider forces the project `web/` directory to be the document root
-and does not allow virtual-host changes, use the included root `index.php`:
-
-```text
-https://transactions.example.com/index.php
-```
-
-It delegates to `public/index.php` and adjusts the asset path automatically. The root
-`.htaccess` disables directory listings and blocks HTTP access to application source,
-configuration, SQL, storage, tests, views, dotfiles, logs, and local databases. The
-root `.user.ini` applies the required upload and execution limits.
-
-This compatibility mode requires Apache with `.htaccess` support. Using `public/` as
-the real document root remains the preferred production deployment when server
-configuration becomes available.
-
-## MySQL 8
+- PHP 8.1+ with `pdo_mysql` and `mbstring`
+- MySQL 8
+- A writable `storage/logs` directory, or access to the PHP server error log
 
 Create a dedicated database and least-privilege application user:
 
@@ -61,10 +24,10 @@ GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES
     ON atrium_ledger.* TO 'atrium_app'@'localhost';
 ```
 
-Ensure PHP has the `pdo_mysql` extension, then start the application from `web/`
-by copying the environment template:
+From the project directory, copy the environment template:
 
 ```bash
+cd web
 cp .env.example .env
 ```
 
@@ -83,36 +46,27 @@ php -d upload_max_filesize=50M -d post_max_size=52M -d max_execution_time=300 \
     -S 127.0.0.1:8080 -t public
 ```
 
-The application detects MySQL and applies `database/schema.mysql.sql`
-automatically. Existing SQLite data is not copied, so upload the CSV once after
-switching databases. `.env` is ignored by Git. Environment variables supplied by a
-deployment platform take precedence over values in `.env`.
+The application applies the idempotent MySQL schema in
+`database/schema.mysql.sql` on startup. `.env` is ignored by Git, and real environment
+variables supplied by a deployment platform take precedence.
 
-## PostgreSQL
-
-Create a database and application user:
-
-```sql
-CREATE USER atrium_app WITH PASSWORD 'replace-with-a-strong-password';
-CREATE DATABASE atrium_ledger OWNER atrium_app;
-```
-
-Ensure PHP has the `pdo_pgsql` extension, then start the application with PostgreSQL
-connection settings:
+Open `http://127.0.0.1:8080`, select **Import CSV**, and upload
+`../transactions_dirty.csv`. For reproducible imports, use:
 
 ```bash
-export DB_DSN='pgsql:host=127.0.0.1;port=5432;dbname=atrium_ledger'
-export DB_USERNAME='atrium_app'
-export DB_PASSWORD='replace-with-a-strong-password'
-
-php -d upload_max_filesize=50M -d post_max_size=52M -d max_execution_time=300 \
-    -S 127.0.0.1:8080 -t public
+php bin/import.php ../transactions_dirty.csv
 ```
 
-The application detects the PDO driver and applies
-`database/schema.postgresql.sql` automatically. Existing SQLite data is not copied;
-upload the CSV again after switching databases. In production, provide secrets through
-the deployment environment or a secret manager rather than committing them.
+The explicit PHP options are important because the supplied CSV is larger than PHP's
+common 2 MB default. Apache/FPM deployments can use the included `.user.ini`.
+
+### Fixed web-root hosting
+
+If hosting forces the project `web/` directory to be the document root, use the
+included root `index.php`. It delegates to `public/index.php`, while `.htaccess`
+disables directory listings and blocks direct access to source, configuration, SQL,
+storage, tests, logs, and `.env`. This compatibility mode requires Apache with
+`.htaccess` support; `public/` remains the preferred document root.
 
 ## Design
 
@@ -205,5 +159,5 @@ php -d zend.assertions=1 -d assert.exception=1 tests/TransactionValidatorTest.ph
 
 ## What I would improve with additional time
 
-The defaults optimize reviewer ergonomics, not infrastructure scale. In a multi-instance deployment, use PostgreSQL/MySQL, move imports to a supervised queue, persist uploads in private object storage, terminate TLS at the edge, add authentication/authorization, CSRF protection, rate limiting, centralized logs/metrics, backup policies, and schema migrations managed as versioned releases. Card values in this dataset are tokens; raw PAN data must never be stored without a PCI DSS compliant design.
+The defaults optimize reviewer ergonomics, not infrastructure scale. In a multi-instance deployment, move imports to a supervised queue, persist uploads in private object storage, terminate TLS at the edge, add authentication/authorization, rate limiting, centralized logs/metrics, backup policies, and schema migrations managed as versioned releases. Card values in this dataset are tokens; raw PAN data must never be stored without a PCI DSS compliant design.
 # atrium

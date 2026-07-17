@@ -28,12 +28,7 @@ foreach ([BASE_PATH . '/storage', BASE_PATH . '/storage/logs'] as $directory) {
 
 $config = require BASE_PATH . '/config/database.php';
 $pdo = Connection::create($config);
-$schema = match ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME)) {
-    'mysql' => BASE_PATH . '/database/schema.mysql.sql',
-    'pgsql' => BASE_PATH . '/database/schema.postgresql.sql',
-    default => BASE_PATH . '/database/schema.sql',
-};
-Connection::migrate($pdo, $schema);
+Connection::migrate($pdo, BASE_PATH . '/database/schema.mysql.sql');
 $logger = new Logger(BASE_PATH . '/storage/logs/application.log');
 
 return ['pdo' => $pdo, 'logger' => $logger];

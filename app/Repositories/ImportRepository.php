@@ -21,14 +21,6 @@ final class ImportRepository
 
     public function create(string $filename, string $checksum): int
     {
-        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
-            $statement = $this->pdo->prepare(
-                'INSERT INTO imports (filename, checksum) VALUES (:filename, :checksum) RETURNING id'
-            );
-            $statement->execute(['filename' => $filename, 'checksum' => $checksum]);
-            return (int) $statement->fetchColumn();
-        }
-
         $statement = $this->pdo->prepare('INSERT INTO imports (filename, checksum) VALUES (:filename, :checksum)');
         $statement->execute(['filename' => $filename, 'checksum' => $checksum]);
         return (int) $this->pdo->lastInsertId();
