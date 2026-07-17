@@ -1,0 +1,6 @@
+/storage/database.sqlite
+/storage/database.sqlite-shm
+/storage/database.sqlite-wal
+/storage/logs/*.log
+!/storage/logs/.gitkeep
+/.env
