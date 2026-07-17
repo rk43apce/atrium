@@ -10,7 +10,7 @@ unset($_SESSION['flash']);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Transaction operations console">
     <title><?= e($title ?? 'Ledger') ?> · Atrium Ledger</title>
-    <link rel="stylesheet" href="assets/app.css">
+    <link rel="stylesheet" href="<?= e((defined('PUBLIC_ASSET_PREFIX') ? PUBLIC_ASSET_PREFIX : '') . 'assets/app.css') ?>">
 </head>
 <body>
 <header class="topbar">

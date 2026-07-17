@@ -1,0 +1,13 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Internal application files must never be served by the web server.
+    RewriteRule ^(?:app|bin|config|database|storage|tests|views)(?:/|$) - [R=404,L,NC]
+    RewriteRule ^public/index\.php$ / [R=302,L]
+</IfModule>
+
+<FilesMatch "(^\.|\.sql$|\.log$|\.sqlite(?:-shm|-wal)?$|^README\.md$)">
+    Require all denied
+</FilesMatch>

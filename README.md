@@ -27,6 +27,24 @@ upload limit is commonly 2 MB, while the supplied CSV is approximately 2.5 MB. F
 Apache/FPM deployments, `public/.user.ini` supplies the same limits when user INI files
 are enabled.
 
+### Fixed web-root hosting
+
+If the hosting provider forces the project `web/` directory to be the document root
+and does not allow virtual-host changes, use the included root `index.php`:
+
+```text
+https://transactions.example.com/index.php
+```
+
+It delegates to `public/index.php` and adjusts the asset path automatically. The root
+`.htaccess` disables directory listings and blocks HTTP access to application source,
+configuration, SQL, storage, tests, views, dotfiles, logs, and local databases. The
+root `.user.ini` applies the required upload and execution limits.
+
+This compatibility mode requires Apache with `.htaccess` support. Using `public/` as
+the real document root remains the preferred production deployment when server
+configuration becomes available.
+
 ## MySQL 8
 
 Create a dedicated database and least-privilege application user:
