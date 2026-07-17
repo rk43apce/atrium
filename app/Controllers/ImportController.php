@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Http\Response;
 use App\Http\View;
 use App\Services\CsvImportService;
+use Throwable;
 
 final class ImportController
 {
@@ -47,8 +48,11 @@ final class ImportController
                     $result['counts']['duplicates'],
                 )];
             Response::redirect(url());
-        } catch (\RuntimeException $exception) {
-            $_SESSION['flash'] = ['type' => 'error', 'message' => $exception->getMessage()];
+        } catch (Throwable $exception) {
+            $_SESSION['flash'] = [
+                'type' => 'error',
+                'message' => 'Import failed: ' . $exception->getMessage(),
+            ];
             Response::redirect(url('import'));
         }
     }
