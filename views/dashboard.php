@@ -1,6 +1,14 @@
 <section class="page-heading">
     <div><p class="eyebrow">Operations overview</p><h1>Transaction activity</h1><p>Monitor processing volume, import health, and ledger value.</p></div>
-    <a class="button primary" href="<?= e(url('import')) ?>">Import transactions</a>
+    <div class="heading-actions">
+        <?php if ((int) ($metrics['total_transactions'] ?? 0) > 0 || !empty($metrics['filename'])): ?>
+            <form method="post" action="<?= e(url('reset-data')) ?>" onsubmit="return confirm('Delete all transactions, rejected rows, and import history? This cannot be undone.');">
+                <input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>">
+                <button class="button danger" type="submit">Reset all data</button>
+            </form>
+        <?php endif; ?>
+        <a class="button primary" href="<?= e(url('import')) ?>">Import transactions</a>
+    </div>
 </section>
 
 <section class="metrics" aria-label="Summary">

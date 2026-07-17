@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\DashboardController;
+use App\Controllers\DataResetController;
 use App\Controllers\ApiController;
 use App\Controllers\ImportController;
 use App\Controllers\RejectedRowController;
@@ -15,6 +16,7 @@ use App\Repositories\RejectedRowRepository;
 use App\Repositories\ReportRepository;
 use App\Repositories\TransactionRepository;
 use App\Services\CsvImportService;
+use App\Services\DataResetService;
 use App\Validation\TransactionValidator;
 
 session_start([
@@ -39,6 +41,7 @@ $importService = new CsvImportService(
     $container['logger'],
 );
 $api = new ApiController($transactions, $rejections, $imports, $reports, $importService);
+$dataResetService = new DataResetService($container['pdo'], $container['logger']);
 
 $route = trim((string) ($_GET['route'] ?? ''), '/');
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -50,6 +53,7 @@ $routes = [
     'GET reports/daily' => [new ReportController($reports), 'daily'],
     'GET import' => [new ImportController($importService), 'form'],
     'POST import' => [new ImportController($importService), 'store'],
+    'POST reset-data' => [new DataResetController($dataResetService), 'store'],
     'GET api/v1/transactions' => [$api, 'transactions'],
     'GET api/v1/transaction' => [$api, 'transaction'],
     'GET api/v1/rejected-rows' => [$api, 'rejectedRows'],

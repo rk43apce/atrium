@@ -3,3 +3,4 @@
 .transaction-cell{width:260px;max-width:260px}.reference{display:block;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}.break-anywhere{overflow-wrap:anywhere;word-break:break-word}
 .table-wrap{max-height:calc(100vh - 180px);overflow:auto;overscroll-behavior:contain}thead{top:0}
 .report-filters{grid-template-columns:180px 180px auto auto;justify-content:start}.positive{color:var(--success)}.negative{color:var(--danger)}
+.heading-actions{display:flex;align-items:center;gap:10px}.heading-actions form{margin:0}.button.danger{color:var(--danger);border-color:#efc3bf;background:#fff}.button.danger:hover{color:#fff;border-color:var(--danger);background:var(--danger)}
